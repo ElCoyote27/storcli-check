@@ -97,7 +97,7 @@ DRIVER_RE = re.compile("""
     ^Driver\sVersion\s=\s(?P<version>.+?)\s*$
 """, re.VERBOSE | re.MULTILINE | re.IGNORECASE | re.DOTALL)
 
-def find_storcli(logger, names=["storcli", "storcli64"]):
+def find_storcli(logger, names=["storcli", "storcli64", "perccli64", "storcli2" ]):
     """Look for the storcli application.  This is a little tricky because we
     may be running from cron (which has a very different path).
     """
@@ -127,13 +127,24 @@ def find_storcli(logger, names=["storcli", "storcli64"]):
         os.path.join(os.sep, "opt", "MegaRAID", "storcli", x)
         for x in names]
 
+    # Avago/broadcom have renamed the tool once again..
+    default_paths += [
+        os.path.join(os.sep, "opt", "MegaRAID", "storcli2", x)
+        for x in names]
+
     # Add the default location of the VIB on ESXi (1.23.02)
     default_paths += [
         os.path.join(os.sep, "opt", "lsi", "storcli", x)
         for x in names]
 
+    # On Dell systems, this is called perccli
+    default_paths += [
+        os.path.join(os.sep, "opt", "MegaRAID", "perccli", x)
+        for x in names]
+
     # I like to put stuff in /usr/local/bin, which may not be in $PATH depending
     # on who's running this command.
+    default_paths += [os.path.join("/usr/local/sbin", x) for x in names]
     default_paths += [os.path.join("/usr/local/bin", x) for x in names]
 
     # Finally, search for the executable
